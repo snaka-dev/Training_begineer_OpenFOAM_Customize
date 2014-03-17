@@ -85,6 +85,9 @@ Make subdirectory の 'files' file を修正する。
 ### ベースコードがコンパイルできることを確認する ###
 
 
+![Alt text](https://github.com/snaka-dev/Training_begineer_OpenFOAM_Customize/blob/master/images/directoryTreeAfterComplilation.png?raw=true "directories after compile")
+
+
 ### コンパイルしたベースコードが実行できることを確認する ###
 
 
