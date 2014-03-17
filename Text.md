@@ -276,28 +276,20 @@ constant/transportProperties に，DTを追加。（nuを参考に）
         }
     }
 
-system/fvSchemes ファイルに，温度場の解き方に関する設定を追加。
+system/fvSchemes ファイルに，温度場の解き方に関する設定を追加。OpenFOAMのバージョンが2.2以前の場合には，下記に加えてlaplacianSchemes にも追加が必要である。Uの場合と同様とすればよい。
 
     divSchemes
     {
         default         none;
-        div(phi,U)      Gauss linear; //NOTICE: there is no space between the comma and the variables
-        div(phi,T)      Gauss upwind; 
-    }
-
-    laplacianSchemes
-    {
-        default         none;
-        laplacian(nu,U) Gauss linear corrected;
-        laplacian((1|A(U)),p) Gauss linear corrected;
-        laplacian(DT,T) Gauss linear corrected;
+        div(phi,U)      Gauss linear;
+        div(phi,T)      Gauss upwind; //NOTICE: there is no space between the comma and the variables
     }
 
 system/fvSolution ファイルに，温度場の解き方に関する設定を追加。
 
     solvers
     {
-        p PCG
+        p
         {
             //information about the pressure solver
         };
