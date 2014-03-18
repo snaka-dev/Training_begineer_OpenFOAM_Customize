@@ -5,17 +5,28 @@
 
 今回の講習の目的は，OpenFOAMをカスタマイズ（ソースコードを変更する）ための手順の全体像を学ぶことである。時間に制約があるため，ソースコードの詳細には触れない。
 
+
+## 参考情報 ##
+http://openfoamwiki.net/index.php/How_to_add_temperature_to_icoFoam
+
+
+## 環境 ##
+
+この資料は，OpenFOAM 2.3.0 を基準として作成した。しかし，この資料の元となる openfoamwiki は 1.7 に対するものであるが，ほとんど同じ内容のままである。その間のバージョンであれば，この資料の内容で問題ないであろう。
+
 ## 手順 ##
 
 1.   ベースとなるコードの選定
 2.   ベースコードをユーザ作業ディレクトリに複製
-3.   ベースコードの例題ディレクトリをユーザ実行ディレクトリに複製（名前の変更作業）
+3.   ベースコードを新しい名前のソルバにする（名前の変更作業のみ：中身はそのまま）
 4.   ベースコードがコンパイルできることを確認する
 5.   コンパイルしたベースコードが実行できることを確認する
-6.   コードの変更
-7.   コンパイル
-8.   例題の変更
-9.   実行   
+6.   コードの変更（その1：createFields.H）
+7.   コードの変更（その2：my_icoFoam.C）
+8.   コンパイル
+9.   例題の変更
+10.  実行
+11.  付録：関連するディレクトリの調査
 
 
 ## 実作業 ##
@@ -24,9 +35,13 @@
 
 OpenFOAMからオリジナルコードを作成する時には，既存のコードから目的に近いモノを選び，修正していくことを推奨する。
 
-今回は，非定常，非圧縮，層流を解くicoFoamをベースとする。これに，温度場を求めるためのエネルギー方程式を追加する。ただし，温度場と速度場とは連成しないものとする。
+今回は，非定常，非圧縮，層流を解くicoFoamをベースとする。これに，温度場を求めるためのエネルギー方程式を追加する。
 
-温度場の式
+![Alt text](./images/UEqn.png "U equation")
+
+![Alt text](./images/TEqn.png "T equation")
+
+
 
 ### 2. ベースコードをユーザ作業ディレクトリに複製 ###
 
@@ -102,7 +117,7 @@ OpenFOAMインストール時の実行ファイルは，`$FOAM_APPBIN` ディレ
 
 
 
-### 3. ベースコードの例題ディレクトリをユーザ実行ディレクトリに複製（名前の変更作業） ###
+### 3. ベースコードを新しい名前のソルバにする（名前の変更作業のみ：中身はそのまま） ###
 
 my_icoFoam ディレクトリへ移動する
 
@@ -156,22 +171,46 @@ my_icoFoam ディレクトリへ移動する。（先ほどと同じ場所）
 
     wmake
 
-
-### 5. コンパイルしたベースコードが実行できることを確認する ###
-
-実行ファイルができたことを確認する．
+実行ファイルができたことを確認するため，下記コマンドを実行する。 my\_icoFoam が存在すればOK。コンパイル時にエラーが発生しないにもかかわらず、my_icoFoam が見当たらない場合は，Make/files ファイルにおいて、EXE= 以下の指定がちがう可能性が高い。
 
     ls $FOAM_USER_APPBIN
-
 
 実行後のディレクトリ構造。ソルバ用，実行形式ファイル用，実行用ディレクトリが存在する。
 
 ![Alt text](./images/directoryTreeAfterComplilation.png "directories after compile")
 
 
-### 6. コードの変更 ###
+### 5. コンパイルしたベースコードが実行できることを確認する ###
 
-createField.H に，DT と T を追加する。
+
+ベースとなったicoFoam用の例題 cavity を，`my_icoFoam_cavity` という名前にして，ユーザの実行ディレクトリに複製する。
+
+    cd $FOAM_RUN/tutorials/incompressible/icoFoam
+
+    cp -r cavity $FOAM_RUN/my_icoFoam_cavity
+
+> ファイルマネージャーで操作する場合
+> 
+> $FOAM_RUN/tutorials/incompressible/icoFoam ディレクトリを開く。
+> 
+> cavity ディレクトリをコピーして，$FOAM_RUN ディレクトリに貼り付ける。名前を `my_icoFoam_cavity` に変更する。
+
+
+新しく作成したディレクトリに移動して，my_icoFoam を実行する。エラーが発生せず、実行できればOK。
+
+    cd $FOAM_RUN/my_icoFoam_cavity
+    my_icoFoam
+
+
+### 6. コードの変更（その1：createField.H） ###
+
+ここから，ソースコードの改造に入る。まず，createField.H に，DT と T を追加する。
+
+DTは熱拡散率であり，速度場のnuに対応するものである。nuと同様に，次元を持つスカラー量 dimensionedScalar 型とする。transportProperties ファイルから値を読み込む。
+
+Tは温度場である。圧力と同様に，セル中心で値を持つスカラー量 volScalarField 型とする。圧力などと同様に，計算時には時刻ディレクトリ（runTime.tiimeName()）から値を読み込み/書き出しする。
+
+下記に追記する部分の内容を記す。詳細は別途配布資料を参照のこと。
 
     Info<< "Reading transportProperties\n" << endl;
 
@@ -212,7 +251,12 @@ createField.H に，DT と T を追加する。
          mesh
     );
 
-my_icoFoam.C に，温度場の式を追加。
+
+### 7. コードの変更（その2：my_icoFoam.C） ###
+
+次に，my_icoFoam.C に，温度場の式を追加する。温度場の基礎式は速度場と同様であり，Uの式を参考にする。UはVectorであるが，温度はスカラーなので，fvScalarMatrix として温度を求めるための行列 TEqn を定義し，解く。 
+
+下記に追記する部分の内容を記す。詳細は別途配布資料を参照のこと。
     
                  U -= rUA*fvc::grad(p);
                  U.correctBoundaryConditions();
@@ -232,20 +276,28 @@ my_icoFoam.C に，温度場の式を追加。
             runTime.write();
 
 
+実行とは直接関係しないが，このファイルの冒頭コメント部にある Application を icoFoam から my_icoFoam に修正しておく。
 
-### 7. コンパイル ###
+### 8. コンパイル ###
 
     cd $WM_PROJECT_USER_DIR/applications/solvers/my_icoFoam
 
     wmake
 
-### 8. 例題の変更 ###
+### 9. 例題の変更 ###
 
-constant/transportProperties に，DTを追加。（nuを参考に）
+先に作成した例題ディレクトリ my_icoFoam_cavity を変更して，温度関係の設定を追加する。
+
+まず，先ほどの計算結果を削除して初期状態に戻すため，`foamCleanTutorials` を実行する。
+
+    cd $FOAM_RUN/my_icoFoam_cavity
+    foamCleanTutorials
+
+constant/transportProperties に，nuを参考にして，DTを追加する。単位はどちらも同じで，mの2乗とsの-1乗である。値を0.002とする。
 
     DT            DT [0 2 -1 0 0 0 0] 0.002;
 
-0/ ディレクトリに，T ファイルを追加。（pを参考に）内容は下記の通り。
+0/ ディレクトリに，T ファイルを追加する。 pファイルを複製して、名前をTとする。内容は下記の通り。上部の移動壁を350度に固定し，その他の壁面は300度に固定する。
 
        class           volScalarField;
         object          T;
@@ -304,19 +356,17 @@ system/fvSolution ファイルに，温度場の解き方に関する設定を�
     //done editing...
 
 
-### 9. 実行 ###
+### 10. 実行 ###
 
 例題ディレクトリから，新しく作成したソルバ my_icoFoam を実行する。
 
+    cd $FOAM_RUN/my_icoFoam_cavity
     my_icoFoam 
-
-## 参考情報 ##
-http://openfoamwiki.net/index.php/How_to_add_temperature_to_icoFoam
 
 
 ---
 
-## ディレクトリ　まとめ ##
+## 付録：関連するディレクトリの調査 ##
 
 下記の環境変数の値（ディレクトリ）を確認しましょう。
 
@@ -368,7 +418,7 @@ http://openfoamwiki.net/index.php/How_to_add_temperature_to_icoFoam
 
     あなたの環境　＝　_________________________________
 
-##### ユーザーの実行ファイル(bin)ディレクトリ #####
+##### ユーザーの作業（実行）ディレクトリ #####
 
     $FOAM_RUN
 
