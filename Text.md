@@ -12,7 +12,7 @@ http://openfoamwiki.net/index.php/How_to_add_temperature_to_icoFoam
 
 ## 環境 ##
 
-この資料は，OpenFOAM 2.3.0 を基準として作成した。しかし，この資料の元となる openfoamwiki は 1.7 に対するものであるが，ほとんど同じ内容のままである。その間のバージョンであれば，この資料の内容で問題ないであろう。
+この資料は，OpenFOAM 2.3.0 を基準として作成した。この資料の元となる openfoamwiki は 1.7 に対するものであるが，ほとんど同じ内容のままである。その間のバージョンであれば，問題なく適用できるはず。
 
 ## 手順 ##
 
@@ -140,7 +140,7 @@ Make subdirectory の 'files' file を修正する。エディタを起動し，
 
 不要なディレクトリを削除する（icoFoamコンパイル時に生成されていたもの）
 
-    rm -rf Make/linuxGccDP0pt
+    rm -rf Make/linuxGccDPOpt
 
 > ファイルマネージャーで操作する場合
 > 
@@ -158,7 +158,7 @@ Make subdirectory の 'files' file を修正する。エディタを起動し，
 > 
 > >    EXE = $(FOAM_USER_APPBIN)/my_icoFoam
 > 
-> Makeディレクトリ内にあるlinuxGccDP0pt ディレクトリを削除する。
+> Makeディレクトリ内にあるlinuxGccDPOpt ディレクトリを削除する。
 
 
 ### 4. ベースコードがコンパイルできることを確認する ###
