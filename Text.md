@@ -9,7 +9,6 @@
 ## 参考情報 ##
 http://openfoamwiki.net/index.php/How_to_add_temperature_to_icoFoam
 
-[http://openfoamwiki.net/index.php/How_to_add_temperature_to_icoFoam](http://openfoamwiki.net/index.php/How_to_add_temperature_to_icoFoam "http://openfoamwiki.net/index.php/How_to_add_temperature_to_icoFoam")
 
 ## 環境 ##
 
@@ -374,10 +373,13 @@ paraFoam で可視化した結果の一例
 
 ### 11. ファイル：ソースコードと例題 ###
 
-新ソルバのソースコード
+上記の作業で完成するソースコードと例題のファイルを，念のために添付します。
 
+新ソルバのソースコード：下記サイトから，my_icoFoam.zip を取得してください。
 
-例題
+例題：下記サイトから，my_icoFoam_cavity.zip を取得してください。
+
+[https://github.com/snaka-dev/Training_begineer_OpenFOAM_Customize](https://github.com/snaka-dev/Training_begineer_OpenFOAM_Customize "https://github.com/snaka-dev/Training_begineer_OpenFOAM_Customize")
 
 
 ---
