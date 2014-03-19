@@ -9,6 +9,7 @@
 ## 参考情報 ##
 http://openfoamwiki.net/index.php/How_to_add_temperature_to_icoFoam
 
+[http://openfoamwiki.net/index.php/How_to_add_temperature_to_icoFoam](http://openfoamwiki.net/index.php/How_to_add_temperature_to_icoFoam "http://openfoamwiki.net/index.php/How_to_add_temperature_to_icoFoam")
 
 ## 環境 ##
 
@@ -26,7 +27,8 @@ http://openfoamwiki.net/index.php/How_to_add_temperature_to_icoFoam
 8.   コンパイル
 9.   例題の変更
 10.  実行
-11.  付録：関連するディレクトリの調査
+11.  ファイル：ソースコードと例題
+12.  付録：関連するディレクトリの調査
 
 
 ## 実作業 ##
@@ -108,7 +110,7 @@ OpenFOAMインストール時の実行ファイルは，`$FOAM_APPBIN` ディレ
 > 
 > icoFoamディレクトリをコピーする。
 > 
-> $WM_PROJECT_USER_DIR/applications/solvers を開く。
+> $WM\_PROJECT\_USER_DIR/applications/solvers を開く。
 > 
 > コピーしたicoFoamディレクトリを貼付け，名前をmy_icoFoamに変更する。
 > 
@@ -199,12 +201,13 @@ my_icoFoam ディレクトリへ移動する。（先ほどと同じ場所）
 新しく作成したディレクトリに移動して，my_icoFoam を実行する。エラーが発生せず、実行できればOK。
 
     cd $FOAM_RUN/my_icoFoam_cavity
+    blockMesh
     my_icoFoam
 
 
 ### 6. コードの変更（その1：createField.H） ###
 
-ここから，ソースコードの改造に入る。まず，createField.H に，DT と T を追加する。
+ここから，ソースコードの改造に入る。まず，$WM\_PROJECT\_USER_DIR/applications/solvers/createField.H ファイルに，DT と T を追記する。
 
 DTは熱拡散率であり，速度場のnuに対応するものである。nuと同様に，次元を持つスカラー量 dimensionedScalar 型とする。transportProperties ファイルから値を読み込む。
 
@@ -286,7 +289,7 @@ Tは温度場である。圧力と同様に，セル中心で値を持つスカ�
 
 ### 9. 例題の変更 ###
 
-先に作成した例題ディレクトリ my_icoFoam_cavity を変更して，温度関係の設定を追加する。
+先に作成した例題ディレクトリ `my_icoFoam_cavity` を変更して，温度関係の設定を追加する。
 
 まず，先ほどの計算結果を削除して初期状態に戻すため，`foamCleanTutorials` を実行する。
 
@@ -297,7 +300,7 @@ constant/transportProperties に，nuを参考にして，DTを追加する。�
 
     DT            DT [0 2 -1 0 0 0 0] 0.002;
 
-0/ ディレクトリに，T ファイルを追加する。 pファイルを複製して、名前をTとする。内容は下記の通り。上部の移動壁を350度に固定し，その他の壁面は300度に固定する。
+0/ ディレクトリに，T ファイルを追加する。 pファイルを複製して、名前をTとする。内容は下記の通り。流体温度の初期値を300度，上部の移動壁を350度に固定し，その他の壁面は300度に固定する。
 
        class           volScalarField;
         object          T;
@@ -361,12 +364,25 @@ system/fvSolution ファイルに，温度場の解き方に関する設定を�
 例題ディレクトリから，新しく作成したソルバ my_icoFoam を実行する。
 
     cd $FOAM_RUN/my_icoFoam_cavity
+    blockMesh
     my_icoFoam 
+
+
+paraFoam で可視化した結果の一例
+![Alt text](./images/my_icoFoam_cavity_tempAndVector.png "temperature map and vector")
+
+
+### 11. ファイル：ソースコードと例題 ###
+
+新ソルバのソースコード
+
+
+例題
 
 
 ---
 
-## 付録：関連するディレクトリの調査 ##
+## 12. 付録：関連するディレクトリの調査 ##
 
 下記の環境変数の値（ディレクトリ）を確認しましょう。
 
