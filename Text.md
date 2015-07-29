@@ -5,6 +5,15 @@
 
 今回の講習の目的は，OpenFOAMをカスタマイズ（ソースコードを変更する）ための手順の全体像を学ぶことである。時間に制約があるため，ソースコードの詳細には触れない。
 
+## Note ##
+
+This offering is not approved or endorsed by ESI Group or ESI-OpenCFD®, 
+the producer of the OpenFOAM® software and owner of the OpenFOAM® trade mark.
+
+Training materials for mini lecture course for OpenCAE Study Group @ Toyama.
+https://www.facebook.com/OpenCAEstudyGroupAtToyama
+
+http://eddy.pu-toyama.ac.jp/%E3%82%AA%E3%83%BC%E3%83%97%E3%83%B3CAE%E5%8B%89%E5%BC%B7%E4%BC%9A-%E5%AF%8C%E5%B1%B1/
 
 ## 参考情報 ##
 http://openfoamwiki.net/index.php/How_to_add_temperature_to_icoFoam
